@@ -16,4 +16,26 @@ if (!firebase.apps.length) {
 }
 
 const db = firebase.database();
-export { db };
+
+// Функция для генерации случайного кода из цифр
+function generateRandomCode(length) {
+  let code = '';
+  for (let i = 0; i < length; i++) {
+    code += Math.floor(Math.random() * 10); // Генерируем случайное число от 0 до 9
+  }
+  return code;
+}
+
+// Функция для сохранения кода в базе данных
+function saveGameCode(code) {
+  db.ref('gameCodes/' + code).set({
+    createdAt: firebase.database.ServerValue.TIMESTAMP,
+    // Другие данные, которые могут понадобиться для игры
+  });
+}
+
+// Генерируем и сохраняем новый код игры из цифр
+const gameCodes = generateRandomCode(6); // Например, 6 символов
+saveGameCode(gameCodes);
+
+export { db, gameCodes };
