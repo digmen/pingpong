@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
-const socket = io('wss://pingpong-op6jay04a-digmen.vercel.app');
+const socket = io('wss://pingpong-git-main-digmen.vercel.app');
 
 function App() {
   const [roomCode, setRoomCode] = useState('');
