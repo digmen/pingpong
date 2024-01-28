@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from './firebaseConfig';
-
+import Cookies from 'js-cookie'; // Импортируем библиотеку js-cookie
 function App() {
   const [roomCode, setRoomCode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -8,8 +8,15 @@ function App() {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
+    const storedRoomCode = Cookies.get('roomCode'); // Получаем roomCode из кук
+    if (storedRoomCode) {
+      setRoomCode(storedRoomCode);
+    }
+  }, []); // Пустой массив зависимостей, чтобы useEffect выполнился только при загрузке
+
+  useEffect(() => {
     if (roomCode) {
-      // Подписываемся на обновления сообщений в текущей комнате
+      Cookies.set('roomCode', roomCode); // Сохраняем roomCode в куки
       const messagesRef = db.ref('messages/' + roomCode);
       messagesRef.on('value', (snapshot) => {
         const messagesData = snapshot.val();
@@ -61,7 +68,6 @@ function App() {
         setErrorMessage('Ошибка при присоединении к комнате');
       });
   };
-
   const sendMessage = () => {
     if (roomCode && message) {
       db.ref('messages/' + roomCode)
@@ -73,6 +79,7 @@ function App() {
         .then(() => {
           console.log('Сообщение отправлено');
           setMessage('');
+          setErrorMessage(''); // Сбрасываем текст ошибки
         })
         .catch((error) => {
           console.error('Ошибка при отправке сообщения:', error);
@@ -98,18 +105,22 @@ function App() {
               value={roomCode}
               onChange={(e) => setRoomCode(e.target.value)}
             />
-            <div className='btn__create_and_join'>
-              <button className='join_btn' onClick={joinRoom}>Присоединиться</button>
-              <button className='create_btn' onClick={createRoom}>Создать новую комнату</button>
+            <div className="btn__create_and_join">
+              <button className="join_btn" onClick={joinRoom}>
+                Присоединиться
+              </button>
+              <button className="create_btn" onClick={createRoom}>
+                Создать новую комнату
+              </button>
             </div>
           </div>
           <h2>Сообщения</h2>
         </div>
         <div>
-          <div>
+          <div className="messege_block">
             {messages.map((message, index) => (
-              <div key={index}>
-                <span>Неизвестно:</span> {message.text}
+              <div className="messege" key={index}>
+                {message.text}
               </div>
             ))}
           </div>
